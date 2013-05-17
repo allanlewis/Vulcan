@@ -1,0 +1,1 @@
+java -jar .\scheme2ddl-2.2.3.jar -url test_mk2/test_mk2@localhost:1521:ORCL -o .\Oracle
