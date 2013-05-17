@@ -236,53 +236,54 @@ as
     return varchar2;
 end error;
 /
-CREATE OR REPLACE PACKAGE BODY "TEST_MK2"."ERROR" 
+CREATE OR REPLACE
+PACKAGE BODY "TEST_MK2"."ERROR"
 is
-function get_message_prefix(    
-p_ex varchar2)  
-return varchar2
-as  
-lPrefix varchar2(4000);
-begin  
-select  initcap(replace(substr(substr( p_ex, instr( p_ex, '.') + 1), instr( p_ex, '_') - instr( p_ex, '.') + 1), '_', ' ')) || ': '    
-into lPrefix    
-from dual;  
-return lPrefix;
+function get_message_prefix(
+    p_ex varchar2)
+  return varchar2
+as
+  lPrefix varchar2(4000);
+begin
+  select   initcap(replace(substr(substr( p_ex, instr( p_ex, '.') + 1), instr( p_ex, '_') - instr( p_ex, '.') + 1), '_', ' ')) || ': '
+    into lPrefix
+    from dual;
+  return lPrefix;
 end get_message_prefix;
-procedure throw(    
-p_exception in varchar2)
+procedure throw(
+    p_exception in varchar2)
 is
-begin  
-throw(p_exception, p_exception);
+begin
+  throw(p_exception, p_exception);
 end;
-procedure throw(    
-p_exception in varchar2,    
-p_message in varchar2 )
-is  
-lPrefix varchar2(4000) :=  get_message_prefix(p_exception);
-begin  
-begin    
-begin      
-execute immediate ('begin raise ' || p_exception || '; end;');      
--- exception is raised and immediately trapped    
-exception    
-when ora_plsql_compilation_error then      
-throw(error.exception_does_not_exist, p_exception);    
-end;  
-exception  
-when others then    
-if sqlcode between - 20999 and - 20000 then      
-raise_application_error(sqlcode, lPrefix || p_message);      
--- this is the best/only use of raise_application_error      
--- and eliminates the need in application code    
-else      
-raise;      
--- nothing extra to do for extra for exceptions outside raise_application_error range    
-end if;  
-end;
+procedure throw(
+    p_exception in varchar2,
+    p_message in varchar2 )
+is
+  lPrefix varchar2(4000) := get_message_prefix(p_exception);
+begin
+  begin
+    begin
+      execute immediate ('begin raise ' || p_exception || '; end;');
+      -- exception is raised and immediately trapped
+    exception
+    when ora_plsql_compilation_error then
+      throw(error.exception_does_not_exist, p_exception);
+    end;
+  exception
+  when others then
+    if sqlcode between - 20999 and - 20000 then
+      raise_application_error(sqlcode, lPrefix || p_message);
+      -- this is the best/only use of raise_application_error
+      -- and eliminates the need in application code
+    else
+      raise;
+      -- nothing extra to do for extra for exceptions outside raise_application_error range
+    end if;
+  end;
 exception
-when others then  
-raise; -- finally, bubbles up the original throw() call
+when others then
+  raise; -- finally, bubbles up the original throw() call
 end throw;
 end error;
 /
