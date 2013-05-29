@@ -165,3 +165,6 @@ pip-log.txt
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
+
+# Cloud 9
+.c9revisions
